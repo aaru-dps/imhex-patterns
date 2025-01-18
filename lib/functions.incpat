@@ -1,0 +1,51 @@
+// /***************************************************************************
+// Aaru Data Preservation Suite
+// ----------------------------------------------------------------------------
+//
+// Filename       : functions.hexpat
+// Author(s)      : Natalia Portillo <claunia@claunia.com>
+//
+// Component      : Functions shared between different ImHex patterns.
+// Version        : 1.00
+//
+// --[ Description ] ----------------------------------------------------------
+//
+//     Functions to be shared between ImHex patterns.
+//
+// --[ History ] --------------------------------------------------------------
+//     
+//     1.00: Initial release.
+//
+// --[ License ] --------------------------------------------------------------
+//
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as
+//     published by the Free Software Foundation, either version 3 of the
+//     License, or (at your option) any later version.
+//
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+//
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// ----------------------------------------------------------------------------
+// Copyright © 2011-2025 Natalia Portillo
+// ****************************************************************************/
+
+#pragma once
+#pragma author Nat Portillo <claunia@claunia.com>
+
+//import std.sys;
+
+fn format_array_as_hex(ref auto arg)
+{
+    str result;
+
+    for (u8 i = 0, i < sizeof(arg), i += 1)
+        result += std::format("{:02X}", arg[i]);
+    
+    return result;
+};
