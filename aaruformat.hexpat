@@ -38,8 +38,8 @@
 #pragma author Nat Portillo <claunia@claunia.com>
 #pragma description AaruFormat parser
 #pragma endian little
-#pragma magic [ 54 4D 52 46 4D 43 49 44 @ 0x00 // DICMFRMT
-#pragma magic [ 54 4D 52 46 55 52 41 41 @ 0x00 // AARUFRMT
+#pragma magic [ 44 49 43 4D 46 52 4D 54 ] @ 0x00 // DICMFRMT
+#pragma magic [ 41 41 52 55 46 52 4D 54 ] @ 0x00 // AARUFRMT
 
 #ifdef __IMHEX__
     import hex.core;
