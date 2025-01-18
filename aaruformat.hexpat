@@ -777,12 +777,6 @@ struct AaruHeader
     Index          *indexOffset : u64;
     type::FILETIME  creationTime;
     type::FILETIME  lastWrittenTime;
-    
-    if(imageMajorVersion >= 3)
-    {
-        u32        mediaType2;
-        type::GUID imageIdentifier;
-    }
 };
 
 struct DdtHeader
@@ -791,32 +785,6 @@ struct DdtHeader
     DataType        type;
     CompressionType compression;
     u8              shift;
-    u64             entries;
-    type::Size<u64> cmpLength;
-    type::Size<u64> length;
-    type::Hex<u64>  cmpCrc64;
-    type::Hex<u64>  crc64;
-    
-    // TODO: Decompress ?
-    if(compression == CompressionType::None)
-        u64 ddt[entries];
-    else
-        u8  data[cmpLength];
-};
-
-struct Ddt2Header
-{
-    BlockType       identifier;
-    DataType        type;
-    CompressionType compression;
-    u8              shift;
-    u8              levels;
-    u8              tableLevel;
-    u64             previousLevel;
-    u16             negative;
-    u64             start;
-    u8              alignment;
-    u8              sizeType;
     u64             entries;
     type::Size<u64> cmpLength;
     type::Size<u64> length;
@@ -1060,35 +1028,6 @@ struct TapePartitionHeader
     TapePartitionEntry partitions[entries];
 };
 
-struct TwinSectorTable
-{
-    BlockType       identifier;
-    u8              alignment;
-    u8              shift;
-    u64             entries;
-    type::Size<u64> length;
-    type::Hex<u64>  crc64;
-    u64             pointers[entries];
-};
-
-struct ParentFileBlock
-{
-    BlockType       identifier;
-    type::Size<u64> length;
-    type::GUID      parentId;
-    type::Size<u16> parentClueLength;
-    char            parentClue[parentClueLength];
-};
-
-struct SnapshotBlock
-{
-    BlockType        identifier;
-    type::Size<u64>  length;
-    u16              generation;
-    Index           *indexOffset : u64;
-    type::FILETIME   creationTime;
-};
-
 struct CompactDiscIndexEntry
 {
     u16 track;
@@ -1105,58 +1044,6 @@ struct CompactDiscIndexesBlock
     CompactDiscIndexEntry indexes[entries];
 };
 
-struct FluxDataEntry
-{
-    u32 head;
-    u16 track;
-    u8  subtrack;
-    u64 resolution;
-    u64 tableEntry;
-};
-
-struct FluxDataBlock
-{
-    BlockType      identifier;
-    u16            entries;
-    type::Hex<u64> crc64;
-    FluxDataEntry  fluxes[entries];
-};
-
-struct BitstreamDataEntry
-{
-    u32 head;
-    u16 track;
-    u8  subtrack;
-    u64 tableEntry;
-};
-
-struct BitstreamDataBlock
-{
-    BlockType          identifier;
-    u16                entries;
-    type::Hex<u64>     crc64;
-    BitstreamDataEntry bitstreams[entries];
-};
-
-struct SectorMapEntry
-{
-    u16 sector;
-    u64 block;
-};
-
-struct TrackLayoutBlock
-{
-    BlockType           identifier;
-    type::Hex<u64>      crc64;
-    u32                 head;
-    u16                 track;
-    u8                  subtrack;
-    u16                 sectors;
-    FluxDataBlock      *flux : u64;
-    BitstreamDataBlock *bitstream : u64;
-    SectorMapEntry      mappings[sectors];
-};
-
 struct IndexEntry
 {
     BlockType blockType;
@@ -1166,27 +1053,16 @@ struct IndexEntry
     {
         (BlockType::DataBlock):                    BlockHeader             *dataBlock          : u64 [[inline]];
         (BlockType::DeDuplicationTable):           DdtHeader               *deduplicationTable : u64 [[inline]];
-        (BlockType::DeDuplicationTable2):          Ddt2Header              *deduplicationTable : u64 [[inline]];
-        (BlockType::Index | BlockType::Index2 | BlockType::IndexContinuation): 
-                                                   Index                   *nextIndex          : u64 [[inline]];
         (BlockType::GeometryBlock):                GeometryBlock           *geometry           : u64 [[inline]];
         (BlockType::MetadataBlock):                MetadataBlock           *metadata           : u64 [[inline]];
         (BlockType::TracksBlock):                  TracksHeader            *tracks             : u64 [[inline]];
         (BlockType::CicmBlock):                    CicmMetadataBlock       *metadata           : u64 [[inline]];
         (BlockType::JsonMetadataBlock):            JsonMetadataBlock       *metadata           : u64 [[inline]];
         (BlockType::ChecksumBlock):                ChecksumHeader          *checksums          : u64 [[inline]];
-// Format not yet defined
-        (BlockType::DataPositionMeasurementBlock): BlockType               *offset             : u64 [[inline]];
-        (BlockType::SnapshotBlock):                SnapshotBlock           *snapshot           : u64 [[inline]];
-        (BlockType::ParentBlock):                  ParentFileBlock         *parentFile         : u64 [[inline]];
         (BlockType::DumpHardwareBlock):            DumpHardwareHeader      *dumpHardware       : u64 [[inline]];
         (BlockType::TapeFileBlock):                TapeFileHeader          *tapeFiles          : u64 [[inline]];
         (BlockType::TapePartitionBlock):           TapePartitionHeader     *tapePartitions     : u64 [[inline]];
-        (BlockType::TwinSectorTable):              TwinSectorTable         *twinSectors        : u64 [[inline]];
         (BlockType::CompactDiscIndexesBlock):      CompactDiscIndexesBlock *compactDiscIndexes : u64 [[inline]];
-        (BlockType::FluxDataBlock):                FluxDataBlock           *fluxData           : u64 [[inline]];
-        (BlockType::BitstreamDataBlock):           BitstreamDataBlock      *bitstreamData      : u64 [[inline]];
-        (BlockType::TrackLayoutBlock):             TrackLayoutBlock        *trackLayout        : u64 [[inline]];
         (_):                                       BlockType               *offset             : u64 [[inline]];
     }
 };
@@ -1197,16 +1073,12 @@ struct Index
     
     if(identifier == BlockType::Index)
         u16 entries;
-    else if(identifier == BlockType::Index2 || identifier == BlockType::IndexContinuation)
+    else if(identifier == BlockType::Index2)
         u64 entries;
     else
         return;
     
     type::Hex<u64> crc64;
-
-    if(identifier == BlockType::IndexContinuation)
-        Index *previous : u64;
-
     IndexEntry items[entries];
 };
 
