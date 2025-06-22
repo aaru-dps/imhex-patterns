@@ -49,3 +49,8 @@ fn format_array_as_hex(ref auto arg)
     
     return result;
 };
+
+fn format_byte_as_hex(u8 arg)
+{
+    return std::format("{}", arg);
+};
