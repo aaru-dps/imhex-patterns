@@ -2,15 +2,15 @@
 // Aaru Data Preservation Suite
 // ----------------------------------------------------------------------------
 //
-// Filename       : aaruformat.hexpat
+// Filename       : otp.hexpat
 // Author(s)      : Natalia Portillo <claunia@claunia.com>
 //
-// Component      : ImHex pattern for parsing Wii U's SPI EEPROM.
+// Component      : ImHex pattern for parsing Wii U's OTP.
 // Version        : 1.00
 //
 // --[ Description ] ----------------------------------------------------------
 //
-//     Parses Wii U's SPI EEPROM dumps.
+//     Parses Wii U's OTP dumps.
 //
 // --[ History ] --------------------------------------------------------------
 //     
