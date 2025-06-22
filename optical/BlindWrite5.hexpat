@@ -37,7 +37,7 @@
 
 #pragma author Nat Portillo <claunia@claunia.com>
 #pragma description BlindWrite 5 disc image parser (*.B5T)
-#pragma endian big
+#pragma endian little
 #pragma magic [ "BWT5 STREAM SIGN" ] @ 0x00
 
 import type.magic;
