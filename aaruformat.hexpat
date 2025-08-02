@@ -53,7 +53,7 @@ import type.time;
 #define DIC_MAGIC "DICMFRMT"
 #define AARU_MAGIC "AARUFRMT"
 
-enum MediaType : u32
+enum MediaTypeOld : u32
 {
     Unknown = 0,
     UnknownMO = 1,
@@ -773,10 +773,24 @@ struct AaruHeader
     u8              imageMinorVersion;
     u8              applicationMajorVersion;
     u8              applicationMinorVersion;
-    MediaType       mediaType;
+    if(imageMajorVersion == 1)
+        MediaTypeOld   mediaType;
+    else
+        u32         mediaType;
     Index          *indexOffset : u64;
     type::FILETIME  creationTime;
     type::FILETIME  lastWrittenTime;
+    
+    if(imageMajorVersion >= 2)
+    {
+        type::GUID  guid;
+        u8          blockAlignmentShift;
+        u8          dataShift;
+        u8          tableShift;
+        u64         featureCompatible;
+        u64         featureCompatibleRo;
+        u64         featureIncompatible;
+    }
 };
 
 struct DdtHeader
