@@ -721,7 +721,7 @@ enum BlockType : u32
 {
     DataBlock                    = 0x4B4C4244,
     DeDuplicationTable           = 0x2A544444,
-    DeDuplicationTable2          = 0x32454444,
+    DeDuplicationTable2          = 0x32544444,
     Index                        = 0x58444E49,
     Index2                       = 0x32584449,
     Index3                       = 0x33584449,
@@ -811,6 +811,58 @@ struct DdtHeader
     else
         u8  data[cmpLength];
 };
+
+struct DdtHeader2
+{
+    /**Identifier, <see cref="BlockType.DeDuplicationTable" /> */
+    BlockType  identifier;
+    /**Type of data pointed by this DDT */
+    DataType  type;
+    /**Compression algorithm used to compress the DDT */
+    CompressionType  compression;
+    /**How many levels of subtables are present */
+    u8 levels;
+    /**Which level this table belongs to */
+    u8 tableLevel;
+    /**Pointer to absolute byte offset in file where the previous level table is located */
+    u64 previousLevelOffset;
+    /**Negative displacement of LBAs */
+    u16  negative;
+    /**Number of blocks in media */
+    u64  blocks;
+    /**Positive overflow displacement of LBAs */
+    u16  overflow;
+    /**First LBA contained in this table */
+    u64  start;
+    /**Block alignment boundaries */
+    u8  blockAlignmentShift;
+    /**Data shift */
+    u8  dataShift;
+    /**Table shift */
+    u8  tableShift;
+    /**Size type */
+    u8  sizeType;
+    /**Entries in this table */
+    u64 entries;
+    /**Compressed length for the DDT */
+    type::Size<u64> cmpLength;
+    /**Uncompressed length for the DDT */
+    type::Size<u64> length;
+    /**CRC64-ECMA of the compressed DDT */
+    type::Hex<u64> cmpCrc64;
+    /**CRC64-ECMA of the uncompressed DDT */
+    type::Hex<u64> crc64;
+    
+    // TODO: Decompress ?
+    if(compression == CompressionType::None)
+        if(sizeType == 0)
+            u16 ddt[entries];
+        else
+            u32 ddt[entries];
+    else
+        u8  data[cmpLength];
+};
+
 
 struct BlockHeader
 {
@@ -1067,20 +1119,21 @@ struct IndexEntry
     
     match(blockType)
     {
-        (BlockType::DataBlock):                    BlockHeader             *dataBlock          : u64 [[inline]];
-        (BlockType::DeDuplicationTable):           DdtHeader               *deduplicationTable : u64 [[inline]];
-        (BlockType::GeometryBlock):                GeometryBlock           *geometry           : u64 [[inline]];
-        (BlockType::MetadataBlock):                MetadataBlock           *metadata           : u64 [[inline]];
-        (BlockType::TracksBlock):                  TracksHeader            *tracks             : u64 [[inline]];
-        (BlockType::CicmBlock):                    CicmMetadataBlock       *metadata           : u64 [[inline]];
-        (BlockType::JsonMetadataBlock):            JsonMetadataBlock       *metadata           : u64 [[inline]];
-        (BlockType::ChecksumBlock):                ChecksumHeader          *checksums          : u64 [[inline]];
-        (BlockType::DumpHardwareBlock):            DumpHardwareHeader      *dumpHardware       : u64 [[inline]];
-        (BlockType::TapeFileBlock):                TapeFileHeader          *tapeFiles          : u64 [[inline]];
-        (BlockType::TapePartitionBlock):           TapePartitionHeader     *tapePartitions     : u64 [[inline]];
-        (BlockType::CompactDiscIndexesBlock):      CompactDiscIndexesBlock *compactDiscIndexes : u64 [[inline]];
-        (BlockType::Index3):                       Index                   *index              : u64 [[inline]];
-        (_):                                       BlockType               *offset             : u64 [[inline]];
+        (BlockType::DataBlock):                    BlockHeader             *dataBlock           : u64 [[inline]];
+        (BlockType::DeDuplicationTable):           DdtHeader               *deduplicationTable  : u64 [[inline]];
+        (BlockType::DeDuplicationTable2):          DdtHeader2              *deduplicationTable2 : u64 [[inline]];
+        (BlockType::GeometryBlock):                GeometryBlock           *geometry            : u64 [[inline]];
+        (BlockType::MetadataBlock):                MetadataBlock           *metadata            : u64 [[inline]];
+        (BlockType::TracksBlock):                  TracksHeader            *tracks              : u64 [[inline]];
+        (BlockType::CicmBlock):                    CicmMetadataBlock       *metadata            : u64 [[inline]];
+        (BlockType::JsonMetadataBlock):            JsonMetadataBlock       *metadata            : u64 [[inline]];
+        (BlockType::ChecksumBlock):                ChecksumHeader          *checksums           : u64 [[inline]];
+        (BlockType::DumpHardwareBlock):            DumpHardwareHeader      *dumpHardware        : u64 [[inline]];
+        (BlockType::TapeFileBlock):                TapeFileHeader          *tapeFiles           : u64 [[inline]];
+        (BlockType::TapePartitionBlock):           TapePartitionHeader     *tapePartitions      : u64 [[inline]];
+        (BlockType::CompactDiscIndexesBlock):      CompactDiscIndexesBlock *compactDiscIndexes  : u64 [[inline]];
+        (BlockType::Index3):                       Index                   *index               : u64 [[inline]];
+        (_):                                       BlockType               *offset              : u64 [[inline]];
     }
 };
 
