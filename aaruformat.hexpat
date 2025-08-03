@@ -724,7 +724,7 @@ enum BlockType : u32
     DeDuplicationTable2          = 0x32454444,
     Index                        = 0x58444E49,
     Index2                       = 0x32584449,
-    IndexContinuation            = 0x43584449,
+    Index3                       = 0x33584449,
     GeometryBlock                = 0x4D4F4547,
     MetadataBlock                = 0x4154454D,
     TracksBlock                  = 0x534B5254,
@@ -1058,6 +1058,8 @@ struct CompactDiscIndexesBlock
     CompactDiscIndexEntry indexes[entries];
 };
 
+using Index;
+
 struct IndexEntry
 {
     BlockType blockType;
@@ -1077,6 +1079,7 @@ struct IndexEntry
         (BlockType::TapeFileBlock):                TapeFileHeader          *tapeFiles          : u64 [[inline]];
         (BlockType::TapePartitionBlock):           TapePartitionHeader     *tapePartitions     : u64 [[inline]];
         (BlockType::CompactDiscIndexesBlock):      CompactDiscIndexesBlock *compactDiscIndexes : u64 [[inline]];
+        (BlockType::Index3):                       Index                   *index              : u64 [[inline]];
         (_):                                       BlockType               *offset             : u64 [[inline]];
     }
 };
@@ -1087,12 +1090,14 @@ struct Index
     
     if(identifier == BlockType::Index)
         u16 entries;
-    else if(identifier == BlockType::Index2)
+    else if(identifier == BlockType::Index2 || identifier == BlockType::Index3)
         u64 entries;
     else
         return;
     
     type::Hex<u64> crc64;
+    if(identifier == BlockType::Index3)
+        u64 previous;
     IndexEntry items[entries];
 };
 
