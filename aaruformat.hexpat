@@ -53,7 +53,7 @@ import type.time;
 #define DIC_MAGIC "DICMFRMT"
 #define AARU_MAGIC "AARUFRMT"
 
-enum MediaTypeOld : u32
+enum MediaType : u32
 {
     Unknown = 0,
     UnknownMO = 1,
@@ -618,7 +618,21 @@ enum MediaTypeOld : u32
     ODC1200RE = 783,
     ODC1500R = 784,
     ODC3300R = 785,
-    ODC5500R = 786
+    ODC5500R = 786,
+    
+    ECMA_322_1k   = 800,
+    ECMA_322_512  = 801,
+    ISO_14517     = 802,
+    ISO_14517_512 = 803,
+    ISO_15041_512 = 804,
+    HSM650        = 805,
+
+    MetaFloppy_Mod_I = 820,
+    HF12 = 823,
+    HF24 = 824,
+
+    AtariLynxCard        = 821,
+    AtariJaguarCartridge = 822
 };
 
 enum CompressionType : u16
@@ -768,15 +782,24 @@ using Index;
 struct AaruHeader
 {
     char            identifier[8];
-    char16          application[32];
+    
+    $ = 0x48;
+    
     u8              imageMajorVersion;
     u8              imageMinorVersion;
+    
+    $ = 0x08;
+    
+    if(imageMajorVersion >= 2)
+        char        application[64];
+    else
+        char16      application[32];
+    
+    $ = 0x4A;
+    
     u8              applicationMajorVersion;
     u8              applicationMinorVersion;
-    if(imageMajorVersion == 1)
-        MediaTypeOld   mediaType;
-    else
-        u32         mediaType;
+    MediaType       mediaType;
     Index          *indexOffset : u64;
     type::FILETIME  creationTime;
     type::FILETIME  lastWrittenTime;
@@ -840,8 +863,6 @@ struct DdtHeader2
     u8  dataShift;
     /**Table shift */
     u8  tableShift;
-    /**Size type */
-    u8  sizeType;
     /**Entries in this table */
     u64 entries;
     /**Compressed length for the DDT */
@@ -855,10 +876,7 @@ struct DdtHeader2
     
     // TODO: Decompress ?
     if(compression == CompressionType::None)
-        if(sizeType == 0)
-            u16 ddt[entries];
-        else
-            u32 ddt[entries];
+        u64 ddt[entries];
     else
         u8  data[cmpLength];
 };
