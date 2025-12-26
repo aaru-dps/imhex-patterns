@@ -850,11 +850,11 @@ struct DdtHeader2
     /**Pointer to absolute byte offset in file where the previous level table is located */
     u64 previousLevelOffset;
     /**Negative displacement of LBAs */
-    u16  negative;
+    u32  negative;
     /**Number of blocks in media */
     u64  blocks;
     /**Positive overflow displacement of LBAs */
-    u16  overflow;
+    u32  overflow;
     /**First LBA contained in this table */
     u64  start;
     /**Block alignment boundaries */
